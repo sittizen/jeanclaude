@@ -112,5 +112,5 @@ if (( ${${(@f)"$(</etc/os-release)"}[(I)ID*=*ubuntu]} )) &&
   compinit
 fi
 
-/prechecks/check_dev_tools.sh
+zsh /opt/prechecks/check_dev_tools.sh
 

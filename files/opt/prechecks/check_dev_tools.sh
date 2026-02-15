@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-DEV_TOOLS_FILE="/prechecks/dev_tools.md"
+DEV_TOOLS_FILE="/opt/prechecks/dev_tools.md"
 
 if [[ ! -f "${DEV_TOOLS_FILE}" ]]; then
   echo "Error: ${DEV_TOOLS_FILE} not found." >&2
@@ -31,6 +31,8 @@ while IFS= read -r line; do
 
   if [[ "${line}" =~ ^([A-Za-z0-9._-]+)==([^[:space:]]+)$ ]]; then
     name="${match[1]:l}"
+    name="${name//\"/}"
+    name="${name//\'/}"
     version="${match[2]}"
     expected_versions["${name}"]="${version}"
   else
@@ -41,8 +43,10 @@ done < "${DEV_TOOLS_FILE}"
 
 declare -A found_versions
 while IFS= read -r line; do
-  if [[ "${line}" =~ ^[[:space:]│├└─]*([A-Za-z0-9._-]+)[[:space:]]+v([^[:space:]]+) ]]; then
+  if [[ "${line}" =~ ^[[:space:]│├└─-]*\"?([A-Za-z0-9._-]+)\"?[[:space:]]+v([^[:space:]]+) ]]; then
     name="${match[1]:l}"
+    name="${name//\"/}"
+    name="${name//\'/}"
     version="${match[2]}"
     found_versions["${name}"]="${version}"
   fi
@@ -73,7 +77,13 @@ for name in ${(k)found_versions}; do
   expected_version="${expected_versions[$name]}"
   if [[ "${actual_version}" != "${expected_version}" ]]; then
     echo "Error: package '${name}' has version ${actual_version} but dev_tools.md specifies ${expected_version}." >&2
-    if ! uv add --group dev "${name}==${expected_version}"; then
+    clean_name="${name//\"/}"
+    clean_name="${clean_name//\'/}"
+    clean_expected_version="${expected_version//\"/}"
+    clean_expected_version="${clean_expected_version//\'/}"
+    package_spec="${clean_name}==${clean_expected_version}"
+    echo "${package_spec}"
+    if ! uv add --group dev "${package_spec}"; then
       errors=1
     fi
   fi
