@@ -76,9 +76,25 @@ for name in ${(k)found_versions}; do
 
   expected_version="${expected_versions[$name]}"
   if [[ "${actual_version}" != "${expected_version}" ]]; then
-    echo "Error: package '${name}' has version ${actual_version} but dev_tools.md specifies ${expected_version}." >&2
+    echo "Fixing: package '${name}' has version ${actual_version} but dev_tools.md specifies ${expected_version}." >&2
     clean_name="${name//\"/}"
     clean_name="${clean_name//\'/}"
+    clean_expected_version="${expected_version//\"/}"
+    clean_expected_version="${clean_expected_version//\'/}"
+    package_spec="${clean_name}==${clean_expected_version}"
+    echo "${package_spec}"
+    if ! uv add --group dev "${package_spec}"; then
+      errors=1
+    fi
+  fi
+done
+
+for name in ${(k)expected_versions}; do
+  if (( ! ${+found_versions[$name]} )); then
+    echo "Fixing: package '${name}' is listed in dev_tools.md but missing from project." >&2
+    clean_name="${name//\"/}"
+    clean_name="${clean_name//\'/}"
+    expected_version="${expected_versions[$name]}"
     clean_expected_version="${expected_version//\"/}"
     clean_expected_version="${clean_expected_version//\'/}"
     package_spec="${clean_name}==${clean_expected_version}"
@@ -94,4 +110,4 @@ if [[ ${errors} -ne 0 ]]; then
   exit 1
 fi
 
-echo "All dev packages match dev_tools.md."
+echo "All dev packages match dev_tools.md"

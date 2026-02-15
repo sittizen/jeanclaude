@@ -113,4 +113,4 @@ if (( ${${(@f)"$(</etc/os-release)"}[(I)ID*=*ubuntu]} )) &&
 fi
 
 zsh /opt/prechecks/check_dev_tools.sh
-
+PROMPT='>'
