@@ -113,4 +113,5 @@ if (( ${${(@f)"$(</etc/os-release)"}[(I)ID*=*ubuntu]} )) &&
 fi
 
 zsh /opt/prechecks/check_dev_tools.sh
+python3 /opt/prechecks/check_poe_tasks.py
 PROMPT='♪ᕕ(ᐛ)ᕗ '
