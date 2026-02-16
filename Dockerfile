@@ -1,6 +1,6 @@
 FROM astral/uv:alpine
 
-RUN apk add zsh build-base
+RUN apk add zsh build-base python3
 
 COPY files/ /
 
