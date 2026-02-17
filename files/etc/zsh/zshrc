@@ -97,8 +97,7 @@ zstyle ':completion:*:sudo:*' command-path /usr/local/sbin \
                                            /usr/sbin       \
                                            /usr/bin        \
                                            /sbin           \
-                                           /bin            \
-                                           /usr/X11R6/bin
+                                           /bin
 
 (( ${+aliases[run-help]} )) && unalias run-help
 autoload -Uz run-help
@@ -111,7 +110,9 @@ if (( ${${(@f)"$(</etc/os-release)"}[(I)ID*=*ubuntu]} )) &&
   autoload -U compinit
   compinit
 fi
-
+echo "Syncing toolchain tools with local env..."
+echo ""
 zsh /opt/prechecks/check_dev_tools.sh
+echo ""
 python3 /opt/prechecks/check_poe_tasks.py
 PROMPT='♪ᕕ(ᐛ)ᕗ '

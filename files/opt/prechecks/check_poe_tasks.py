@@ -42,16 +42,12 @@ def main() -> int:
     dst_tasks = get_table(dst_doc, ["tool", "poe", "tasks"])
 
     changed = False
+    print("Found poe tasks from toolchain:")
     for name, value in src_tasks.items():
+        print(name)
         if name not in dst_tasks or dst_tasks[name] != value:
             dst_tasks[name] = value
             changed = True
-
-    # optional: enforce removal of tasks not in source-of-truth
-    # for name in list(dst_tasks.keys()):
-    #     if name not in src_tasks:
-    #         del dst_tasks[name]
-    #         changed = True
 
     new_text = tomlkit.dumps(dst_doc)
     if changed and new_text != dst_text:

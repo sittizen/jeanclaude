@@ -59,12 +59,9 @@ if [[ ${#found_versions[@]} -eq 0 ]]; then
   exit 1
 fi
 
-echo "Found dev packages from uv tree:"
-for name in ${(k)found_versions}; do
-  echo "- ${name}==${found_versions[$name]}"
-done | sort
 
 errors=0
+echo "Found dev packages from toolchain:"
 for name in ${(k)found_versions}; do
   actual_version="${found_versions[$name]}"
 
@@ -75,10 +72,10 @@ for name in ${(k)found_versions}; do
   fi
 
   expected_version="${expected_versions[$name]}"
+  clean_name="${name//\"/}"
+  echo "${clean_name}"
   if [[ "${actual_version}" != "${expected_version}" ]]; then
     echo "Fixing: package '${name}' has version ${actual_version} but dev_tools.md specifies ${expected_version}." >&2
-    clean_name="${name//\"/}"
-    clean_name="${clean_name//\'/}"
     clean_expected_version="${expected_version//\"/}"
     clean_expected_version="${clean_expected_version//\'/}"
     package_spec="${clean_name}==${clean_expected_version}"
@@ -110,4 +107,4 @@ if [[ ${errors} -ne 0 ]]; then
   exit 1
 fi
 
-echo "All dev packages match dev_tools.md"
+echo "pyproject.toml already in sync"
