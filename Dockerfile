@@ -7,6 +7,7 @@ RUN curl -fsSL https://opencode.ai/install | bash && mv /root/.opencode /opt && 
 COPY files/ /
 
 ENV HOME=/workspace \
+    PYTHONPATH=/workspace/src \
     UV_PROJECT_ENVIRONMENT=/workspace/.venv
 
 WORKDIR /workspace
