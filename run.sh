@@ -77,7 +77,9 @@ case "$ACTION" in
 
     docker build -t "$IMAGE_TAG" .
     docker run --rm -it \
+      --user "$(id -u):$(id -g)" \
       -v "/home/sc/.config/opencode:/workspace/.config/opencode" \
+      -v "/home/sc/.local/share/opencode:/workspace/.local/share/opencoe" \
       -v "$ABS_HOST_PATH:$CONTAINER_PATH" \
       -w "$CONTAINER_PATH" \
       "$IMAGE_TAG" zsh
