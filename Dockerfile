@@ -1,9 +1,9 @@
-FROM astral/uv:alpine
+FROM astral/uv:debian-slim
 #FROM debian:bookworm-slim
 
 
-COPY files/usr /usr
-RUN apk add --no-cache zsh build-base cmake sudo curl jq git tar ripgrep python3 py3-tomlkit ca-certificates openldap-dev unixodbc-dev openssl-dev zlib-dev \
+#COPY files/usr /usr#
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends zsh build-essential cmake sudo curl jq git tar ripgrep python3-tomlkit ca-certificates libldap-dev unixodbc-dev libssl-dev zlib1g-dev unzip \
     && curl https://releases.hashicorp.com/vault/1.21.4/vault_1.21.4_linux_amd64.zip --output vault.zip \
     && unzip vault.zip && mv vault /usr/bin/ && rm vault.zip LICENSE.txt \
     && update-ca-certificates \
