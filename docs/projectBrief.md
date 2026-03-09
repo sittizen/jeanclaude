@@ -1,45 +1,53 @@
-# Project Brief: jeanclaude
+# Project Brief: JeanClaude
 
 ## Overview
 
-jeanclaude is a containerized developer shell environment for Python projects managed by `uv` (Astral's Python package manager). It provides a portable, reproducible development shell that enforces consistent dev tooling across projects.
+JeanClaude is a **developer shell container** that provides a standardized, reproducible development environment for Python projects using the `uv` package manager.
 
 ## Problem Statement
 
-Python development environments are fragile and inconsistent across machines and teams. Developers working on `uv`-managed projects need:
+Development teams face challenges with:
+- **Environment inconsistency**: "Works on my machine" syndrome
+- **Tool version drift**: Different developers using different versions of linters, test runners, and formatters
+- **Onboarding friction**: New developers spending time configuring local environments
+- **Credential management**: Securely distributing access to private PyPI repositories and Docker registries
 
-- A consistent shell environment regardless of host OS
-- Enforced dev dependency versions (e.g., test runners, linters) that match team standards
-- A quick way to spin up a validated development shell without manual setup
+## Goals
+
+### Primary Goals
+1. **Standardize development environments** - Every developer works in the same containerized environment
+2. **Enforce toolchain consistency** - Automatically sync dev tool versions (mypy, pytest, ruff) across all projects
+3. **Automate credential injection** - Securely fetch and inject credentials from HashiCorp Vault at container startup
+4. **Standardize task definitions** - Ensure all projects have consistent poe (poethepoet) task definitions for common workflows
+
+### User Experience Goals
+- **Zero-configuration startup**: Developers mount their project and immediately have a working environment
+- **Automatic synchronization**: Tool versions and task definitions are enforced without manual intervention
+- **Clear feedback**: Visual confirmation of environment setup status with the `♪ᕕ(ᐛ)ᕗ` prompt indicator
+
+## Target Users
+
+- Python developers working on projects managed with `uv`
+- Teams requiring consistent development environments
+- Organizations using HashiCorp Vault for secrets management
+- Projects following the `src/` layout convention
 
 ## Core Requirements
 
-1. **Containerized Dev Shell** -- Provide an interactive zsh shell inside a Docker container with the host project mounted, so developers work in a controlled environment
-2. **Project Validation** -- Before granting shell access, verify the target directory is a valid `uv`-managed Python project (has `pyproject.toml` with `[tool.uv]`)
-3. **Dev Tool Enforcement** -- On every shell startup, validate that dev dependencies match pinned versions defined in a declarative manifest (`dev_tools.md`)
-4. **Self-Healing Dependencies** -- When version mismatches are detected, automatically attempt to correct them via `uv add`
-5. **Extensibility** -- Support future actions beyond `shell` (placeholders exist for `publish` and `deploy`)
+### Functional Requirements
+1. Mount any `uv`-based Python project and provide interactive shell access
+2. Validate that mounted projects have proper `[tool.uv]` configuration
+3. Sync development tool versions from a central source-of-truth (`dev_tools.md`)
+4. Sync poe task definitions from a central source-of-truth (`poe_tasks.toml`)
+5. Fetch credentials from Vault and export them as environment variables
 
-## User Experience Goals
+### Non-Functional Requirements
+- Container must be lightweight (Alpine-based)
+- Startup time should be minimal
+- Must work with existing project structures without modification
 
-- **Single command startup**: `./run.sh --action shell --path /path/to/project` drops the developer into a validated shell
-- **Fail-fast validation**: Problems with the project or dev tools surface immediately on shell startup, not during a test run or deploy
-- **Minimal host requirements**: Only Docker and a vterminal needed on the host machine
-- **Transparent**: The developer sees clear output about what checks passed/failed and what was auto-fixed
+## Success Metrics
 
-## Scope
-
-### In Scope
-
-- Docker-based shell environment for `uv`-managed Python projects
-- Declarative dev tool version pinning and enforcement
-- Interactive zsh shell with sensible defaults (keybindings, completion)
-- CLI with action-based dispatch (`shell`, future: `publish`, `deploy`)
-
-### Still TODO
-- `publish` and `deploy` actions (placeholders only)
-
-### Out of Scope
-- Support for non-`uv` Python projects
-- GUI or IDE integration
-- Multi-container or docker-compose setups
+- Time-to-first-command for new developers reduced
+- Zero version conflicts between developer environments
+- Consistent CI/CD and local development tool versions

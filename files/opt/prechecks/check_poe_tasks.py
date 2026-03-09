@@ -60,4 +60,5 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    print("♪ᕕ(ᐛ)ᕗ ")
     raise SystemExit(main())

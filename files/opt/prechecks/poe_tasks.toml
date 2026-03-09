@@ -1,5 +1,13 @@
 [tool.poe.tasks]
-test    =   "uv run pytest tests/"
-lint    =   "uv run ruff check --fix src/"
 format  =   "uv run ruff format src/"
+lint    =   "uv run ruff check --fix src/"
+test    =   "uv run pytest tests/"
+install =   "uv sync --no-install-project"
+tc      =   "uv run mypy --color --pretty --strict --namespace-packages --allow-subclassing-any /app/src"
 
+
+[tool.poe.tasks.syntax]
+sequence    =   [
+    { cmd = 'uv run find /app/src -name "*.py" -exec pyupgrade --py310-plus {} +' },
+    { cmd = 'uv run find /app/tests -name "*.py" -exec pyupgrade --py310-plus {} +' }
+]

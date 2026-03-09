@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+echo '♪ᕕ(ᐛ)ᕗ '
+
 DEV_TOOLS_FILE="/opt/prechecks/dev_tools.md"
 
 if [[ ! -f "${DEV_TOOLS_FILE}" ]]; then
@@ -14,7 +16,7 @@ if ! command -v uv >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! UV_TREE_OUTPUT="$(cd /workspace && uv tree --group dev 2>&1 | grep dev)"; then
+if ! UV_TREE_OUTPUT="$(cd /app && uv tree --group dev 2>&1 | grep dev)"; then
   echo "Error: failed to run 'uv tree --group dev'." >&2
   echo "${UV_TREE_OUTPUT}" >&2
   exit 1

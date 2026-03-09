@@ -5,8 +5,8 @@
 # options, key bindings, etc.
 #
 # Global Order: zshenv, zprofile, zshrc, zlogin
-
-READNULLCMD=${PAGER:-/usr/bin/pager}
+#READNULLCMD=${PAGER:-/usr/bin/pager}
+echo "$UNAME:x:$UID:$GID:,,,:/app:/bin/zsh" >> /etc/passwd
 
 # An array to note missing features to ease diagnosis in case of problems.
 typeset -ga debian_missing_features
@@ -110,9 +110,21 @@ if (( ${${(@f)"$(</etc/os-release)"}[(I)ID*=*ubuntu]} )) &&
   autoload -U compinit
   compinit
 fi
-echo "Syncing toolchain tools with local env..."
+
+
+echo "♪ᕕ(ᐛ)ᕗ Gettin credentials from vault ..."
+export VAULT_ADDR=https://vault.pycc.gmolapps.lcl
+PYPI_VALS=(`/usr/bin/vault read -format json kv/prd/gitlab | jq -r '.data.pypi_install_user, .data.pypi_install_secret, .data.dockerhub_user, .data.dockerhub_secret'`)
+export UV_INDEX_PYPIMOL_GITLAB_USERNAME=${PYPI_VALS[1]}
+export UV_INDEX_PYPIMOL_GITLAB_PASSWORD=${PYPI_VALS[2]}
+export DOCKERHUB_USER=${PYPI_VALS[3]}
+export DOCKERHUB_SECRET=${PYPI_VALS[4]}
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/poethepoet/bin"
+
+echo "♪ᕕ(ᐛ)ᕗ Syncin tools with local env..."
 echo ""
 zsh /opt/prechecks/check_dev_tools.sh
 echo ""
 python3 /opt/prechecks/check_poe_tasks.py
 PROMPT='♪ᕕ(ᐛ)ᕗ '
+
