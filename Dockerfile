@@ -1,22 +1,21 @@
 FROM astral/uv:alpine
+#FROM debian:bookworm-slim
 
-RUN apk add --no-cache zsh build-base curl python3 py3-tomlkit bash sudo git tar ripgrep
-RUN uv tool install poethepoet
-RUN curl -fsSL https://opencode.ai/install | bash && mv /root/.opencode /opt && apk del bash
 
-RUN adduser -D jeanclaude && \
-    addgroup jeanclaude wheel && \
-    echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-USER jeanclaude
-WORKDIR /workspace
+COPY files/usr /usr
+RUN apk add --no-cache zsh build-base cmake sudo curl jq git tar ripgrep python3 py3-tomlkit ca-certificates openldap-dev unixodbc-dev openssl-dev zlib-dev \
+    && curl https://releases.hashicorp.com/vault/1.21.4/vault_1.21.4_linux_amd64.zip --output vault.zip \
+    && unzip vault.zip && mv vault /usr/bin/ && rm vault.zip LICENSE.txt \
+    && update-ca-certificates \
+    && uv tool install poethepoet && mv /root/.local/share/uv/tools/poethepoet /opt \
+    && sed -i '1c\#!/opt/poethepoet/bin/python' /opt/poethepoet/bin/poe
 
-RUN mkdir -p /workspace/.local/share/opencode && chown -R jeanclaude: /workspace/.local/share/opencode
-RUN mkdir -p /workspace/.config/opencode && chown -R jeanclaude: /workspace/.config/opencode
+WORKDIR /app
+
+RUN chmod 666 /etc/passwd
 
 COPY files/ /
-
-ENV HOME=/workspace \
-    PYTHONPATH=/workspace/src \
-    UV_PROJECT_ENVIRONMENT=/workspace/.venv
-
-
+ENV HOME=/app \
+    PYTHONPATH=/app/src \
+    UV_PROJECT_ENVIRONMENT=/app/.venv \
+    UV_NATIVE_TLS=true

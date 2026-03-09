@@ -40,13 +40,19 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+
 if [[ -z "$ACTION" ]]; then
   echo "Error: --action is required." >&2
   usage
   exit 1
 fi
 
+IMAGE_TAG="local/jeanclaude"
+
 case "$ACTION" in
+  upgrade)
+    docker build -t "$IMAGE_TAG" .
+    ;;
   shell)
     if [[ -z "$HOST_PATH" ]]; then
       echo "Error: --path is required for --action shell." >&2
@@ -60,7 +66,7 @@ case "$ACTION" in
 
     ABS_HOST_PATH="$(realpath "$HOST_PATH")"
     PROJECT_NAME="$(basename "$ABS_HOST_PATH")"
-    CONTAINER_PATH="/workspace"
+    CONTAINER_PATH="/app"
     PYPROJECT_FILE="$ABS_HOST_PATH/pyproject.toml"
 
     if [[ ! -f "$PYPROJECT_FILE" ]]; then
@@ -73,18 +79,20 @@ case "$ACTION" in
       exit 1
     fi
 
-    IMAGE_TAG="local/jeanclaude-$ACTION"
 
-    docker build -t "$IMAGE_TAG" .
+    echo "♪ᕕ(ᐛ)ᕗ Running $IMAGE_TAG $ABS_HOST_PATH:$CONTAINER_PATH"
     docker run --rm -it \
-      --user "$(id -u):$(id -g)" \
-      -v "/home/sc/.config/opencode:/workspace/.config/opencode" \
-      -v "/home/sc/.local/share/opencode:/workspace/.local/share/opencoe" \
+      -e VAULT_TOKEN=$VAULT_TOKEN \
       -v "$ABS_HOST_PATH:$CONTAINER_PATH" \
       -w "$CONTAINER_PATH" \
       "$IMAGE_TAG" zsh
     ;;
 
+
+      #--user "$(id -u):$(id -g)" \
+      #-e UID=$(id -u) \
+      #-e GID=$(id -g) \
+      #-e UNAME="$(id -un)" \
   publish)
     echo "publish action placeholder (not implemented yet)"
     ;;
